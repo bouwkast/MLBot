@@ -11,6 +11,8 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.callbacks import EarlyStopping,ModelCheckpoint,TensorBoard
 from keras.optimizers import SGD, RMSprop
 
+# There are many different optimizer formulas that you can use from Keras
+# Each of them are some form of gradient decent algorithm
 sgd = SGD(lr=0.01, momentum=0.75, decay=1e-8, nesterov=False)
 
 
@@ -18,9 +20,19 @@ REPLAY_FOLDER = sys.argv[1]
 training_input = []
 training_target = []
 
-VISIBLE_DISTANCE = 4
+# This variable and the same one in MyBot.py must be the same
+# we can change this - either increase/decrease to get a different model
+VISIBLE_DISTANCE = 4  # how many squares out we will be looking
 input_dim=4*(2*VISIBLE_DISTANCE+1)*(2*VISIBLE_DISTANCE+1)
+# input dimensions - with the base value of 4 explanation
+# we are looking in 4 directions and multiply that by 9 and by 9 again
+# essentially, we have a 9x9 square that is centered on each square that we are looking at
+
 np.random.seed(0) # for reproducibility
+
+# This the basis for how we are going to both form and train our model
+# we are using three convolutions neural networks https://en.wikipedia.org/wiki/Convolutional_neural_network
+
 model = Sequential([Dense(512, input_dim=input_dim),
                     LeakyReLU(),
                     Dense(512),
@@ -28,6 +40,10 @@ model = Sequential([Dense(512, input_dim=input_dim),
                     Dense(512),
                     LeakyReLU(),
                     Dense(5, activation='softmax')])
+
+# This is how we are finding our 'line of best fit' to classify our data so that we can make predictions
+# keras offers different optimizers - while they are similar some are better suited for different tasks
+# I have found that rmsprop works pretty well for this problem
 model.compile('rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
 def stack_to_input(stack, position):
@@ -35,12 +51,13 @@ def stack_to_input(stack, position):
                 np.arange(-VISIBLE_DISTANCE,VISIBLE_DISTANCE + 1)+position[0],axis=1,mode='wrap'),
                 np.arange(-VISIBLE_DISTANCE,VISIBLE_DISTANCE + 1)+position[1],axis=2,mode='wrap').flatten()
 
-size = len(os.listdir(REPLAY_FOLDER))    
+size = len(os.listdir(REPLAY_FOLDER))   # how many replays that we are going to load in and train on
 for index, replay_name in enumerate(os.listdir(REPLAY_FOLDER)):
-    if replay_name[-4:]!='.hlt':continue
-    print('Loading {} ({}/{})'.format(replay_name, index, size))
-    replay = json.load(open('{}/{}'.format(REPLAY_FOLDER,replay_name)))
+    if replay_name[-4:]!='.hlt':continue  # only grab .hlt files
+    print('Loading {} ({}/{})'.format(replay_name, index, size))  # command formatting to look pretty
+    replay = json.load(open('{}/{}'.format(REPLAY_FOLDER,replay_name))) # load the replay from reading the JSON format
 
+    # https://halite.io/advanced_replay_file.php
     frames=np.array(replay['frames'])
     player=frames[:,:,:,0]
     players,counts = np.unique(player[-1],return_counts=True)
@@ -55,6 +72,9 @@ for index, replay_name in enumerate(os.listdir(REPLAY_FOLDER)):
     stacks = stacks.transpose(1,0,2,3)[:len(moves)].astype(np.float32)
 
     position_indices = stacks[:,0].nonzero()
+
+    # we take samples from our games
+    # for example I can load in 500 replay files and will then get around 600K samples to train on
     sampling_rate = 1/stacks[:,0].mean(axis=(1,2))[position_indices[0]]
     sampling_rate *= moves[position_indices].dot(np.array([1,10,10,10,10])) # weight moves 10 times higher than still
     sampling_rate /= sampling_rate.sum()
@@ -76,6 +96,10 @@ np.random.shuffle(indices) #shuffle training samples
 training_input = training_input[indices]
 training_target = training_target[indices]
 
+# this is where we fit our model
+# couple of key points, we cross validate on 20% of our data that we put into memory
+# if we don't improve in 10 epochs we give up and stop
+# max num of epochs is 1000
 model.fit(training_input,training_target,validation_split=0.2,
           callbacks=[EarlyStopping(patience=10),
                      ModelCheckpoint('model.h5',verbose=1,save_best_only=True),

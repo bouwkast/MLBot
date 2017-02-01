@@ -4,87 +4,122 @@ This project will attempt to explain how to setup a machine learning environment
 
 The goal of this is not to explore the formulas and math that are the foundation of machine learning, but to set up a user-friendly environment that is applicable to many problems that can be solved through the use of machine learning.
 
+While this will focus largely on the programming challeng/game [Halite](halite.io), 
+it should be a general enough approach that you will be able to apply the methods here
+ quite easily and gain a better understanding for the mechanics behind machine learning.
 
-## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+
+
+There are several things that must be setup before you can run this project.
+**Graphics Card**
+The first of which will be taking note what kind of graphics card you have - if you have an
+Nvidia based GPU you're in luck because you'll be able to use the GPU-based version of TensorFlow,
+it is much quicker than the base CPU version - unless you have a fancy server CPU.
+
+The benefit of having a GPU is simply the increase in speed, but this is entirely doable
+with a CPU.
+
+**Windows**
+
+I"ll be making the assumption that you are on a recent iteration of the Windows operating system.
+Some of the setup is much easier on Linux and OSX, but Windows works just as well and will
+be referenced throughout the rest of this.
+
+
+**Anaconda**
+Downloading and installing the Anaconda python environment is the quickest and easiest way to 
+get started with scientific research using Python because it comes with many core packages
+that are annoying to install by themselves. 
+
+[Download Anaconda](https://www.continuum.io/downloads)
+
+When installing I would recommend **not** choosing the option to install for all users. If
+you do choose to install for all users you must run Anaconda as admin, which is annoying.
+
+
+**Nvidia**
+
+There are two things we need from Nvidia: [Cuda Toolkit 8.0](https://developer.nvidia.com/cuda-toolkit) 
+and [cudNN v5.1](https://developer.nvidia.com/cudnn)
+Follow the installation instructions for both exactly - install the toolkit and then cudNN
+**Don't install these if you don't have an Nvidia GPU.**
+
+
+### Installing Keras and TensorFlow
+
+It may be to your benefit to create an [Anaconda environment](https://www.tensorflow.org/get_started/os_setup#anaconda_installation)
+ to do this, I won't cover that though.
+
+Open up an Anaconda prompt - if you've installed Anaconda for all users run it as admin.
+
+Type in the following:
+
 
 ```
-Give examples
+pip install keras
 ```
 
-### Installing
+This will install the [Keras](https://keras.io/) package, which we will use to sit on top of TensorFlow.
 
-A step by step series of examples that tell you have to get a development env running
+If it prompts you to do anything (y/n) choose y
 
-Say what the step will be
+Next we need to install [TensorFlow](https://www.tensorflow.org/get_started/os_setup)
 
-```
-Give the example
-```
-
-And repeat
+In the same Anaconda prompt type in the following if you want the GPU-based TensorFlow package
 
 ```
-until finished
+pip install tensorflow-gpu
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
 
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
+If you don't want the GPU-based TensorFlow package type the following:
 ```
-Give an example
+pip install tensorflow
 ```
 
-### And coding style tests
 
-Explain what these tests test and why
+If you ever need to uninstall them replace "install" with "uninstall"
+
+
+You'll want to test to ensure that everything is setup properly.
+To do this, make sure that you have the repository cloned and run the following 
+in a command prompt(or batch file):
 
 ```
-Give an example
+python train_bot.py ./minireplays
 ```
 
-## Deployment
+This should load up around 50 replay files and begin running through the several epochs
+building a model that you will be able to run your bot off of.
 
-Add additional notes about how to deploy this on a live system
+## Fixing Errors
 
-## Built With
+If you are using the GPU-based version of TensorFlow, you might have ran into an issue
+when you ran the above line that several CUDA libraries failed to load.
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+This most likely means you don't have the cudNN folder in your PATH variable and/or the files
+within the cudNN folder are not being found by the CUDA Toolkit.
 
-## Contributing
+To guarantee that it will work add the cudNN folder to your PATH and add the files
+within it to your CUDA Toolkit directory.
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+This _should_ solve any errors - otherwise look on the 
+[TensorFlow help site](https://www.tensorflow.org/get_started/os_setup#common_problems)
 
-## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+## Submitting the Bot
 
-## Authors
+When you have a model that you created add the following to a directory:
+hlt.py
+MyBot.py
+networking.py
+model.m5
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+## Further Inspection
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+Please look to the comments found in train_bot.py for information - this will be updated later
