@@ -9,6 +9,8 @@ it should be a general enough approach that you will be able to apply the method
  quite easily and gain a better understanding for the mechanics behind machine learning.
 
 
+Credit to Github user [brianvanleeuwen](https://github.com/brianvanleeuwen) for supplying the starter code for this machine
+learning bot. - [repo link](https://github.com/brianvanleeuwen/Halite-ML-starter-bot)
 
 
 ### Prerequisites
@@ -123,3 +125,5 @@ model.m5
 ## Further Inspection
 
 Please look to the comments found in train_bot.py for information - this will be updated later
+
+
