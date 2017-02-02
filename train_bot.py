@@ -15,6 +15,14 @@ from keras.optimizers import SGD, RMSprop
 # Each of them are some form of gradient decent algorithm
 sgd = SGD(lr=0.01, momentum=0.75, decay=1e-8, nesterov=False)
 
+# With optimizers come several parameters that we can change, I'll explain what a couple of those are.
+#  lr: this is our learning rate (called it steps in class) they are similar if not the same thing
+#       with a high learning rate we can potentially pass our convergence point at the minima and head in the wrong dir
+#       with a too low learning rate we take way too long to get to our convergence point
+#       trial and error seems to work the best, and some problems have optimized parameters for them already
+#  momentum:
+
+
 
 REPLAY_FOLDER = sys.argv[1]
 training_input = []
@@ -57,12 +65,46 @@ for index, replay_name in enumerate(os.listdir(REPLAY_FOLDER)):
     print('Loading {} ({}/{})'.format(replay_name, index, size))  # command formatting to look pretty
     replay = json.load(open('{}/{}'.format(REPLAY_FOLDER,replay_name))) # load the replay from reading the JSON format
 
+    #  What if we want to target a specific bot?? Are there any advantages?
+    #  One of the most important aspects of machine learning is to not train your model saying that left=right
+    #  it will most likely do nothing.
+
+    #  Going off of this, let's not train off of the winning player whoever that may be
+    #  we are going to train on 'erdman v17' - in this example
+
+    player_array = replay['player_names']
+    target_id = player_array.index('erdman v17')
+
+
+    #  There are however some implications of this line that we have to account for with more tedious methods.
+
+    #  First we need to make sure that erdman v17 is in the replay that we are watching
+    #  Second, because we are no longer skipping when a neutral tile is the largest at the end we run into an issue.
+    #       Sometimes the servers will crap out and nobody will be able to move at all - we don't check for this
+    #  To rectify this situation we have to pre-screen the replays by sorting them by size and deleting the ones
+    #       that are much too small - make sure not to delete all the small ones because they might be actual games
+    #       I found that anything under 50KB was usually a dead game
+
+
+
     # https://halite.io/advanced_replay_file.php
     frames=np.array(replay['frames'])
     player=frames[:,:,:,0]
-    players,counts = np.unique(player[-1],return_counts=True)
-    target_id = players[counts.argmax()]
-    if target_id == 0: continue
+
+    #  WINNER determiner
+    #  what we are doing here is looking at the 4th Dimension of the Frame array from the replay files
+    #  players will store all the player ids (0 = unowned, 1+ are all actual players) and the strength of their cells
+    #  We look at the largest counts (cell strength) and assume that that is the winner
+    #  If the player who owns it is 0, that means it is unowned and we should skip the game
+
+    #  The issue with this idea of training on only the winner is that we might train our bot that
+    #  going left is good and bad and going right is good and bad due to different strategies.
+    #  This would result in the bot not really doing anything to minimize that loss function
+
+    #  We don't need this code anymore
+    # players,counts = np.unique(player[-1],return_counts=True)
+    # target_id = players[counts.argmax()]
+    # if target_id == 0: continue
 
     prod = np.repeat(np.array(replay['productions'])[np.newaxis],replay['num_frames'],axis=0)
     strength = frames[:,:,:,1]
