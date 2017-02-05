@@ -85,16 +85,18 @@ for index, replay_name in enumerate(os.listdir(REPLAY_FOLDER)):
     #  Our current model was a combination of around 1500 of nmalaguti's rank 1 or 2 bots
 
     #  Player IDs start at 1, not 0
-    player_array = replay['player_names']
+    #  Use the below if you want to train on a specific bot - just follow the syntax to fit yours
+
+    # player_array = replay['player_names']  # UNCOMMENT THIS WHEN TRAINING ON SPECIFIC BOT
     # target_id = player_array.index('erdman v17') + 1
     # target_id = player_array.index('nmalaguti v52') + 1
     # target_id = player_array.index('nmalaguti v53') + 1
     # target_id = player_array.index('nmalaguti v54') + 1
     # target_id = player_array.index('mzotkiew v23')
-    if 'nmalaguti v54' in player_array:
-        target_id = player_array.index('nmalaguti v54') + 1
-    else:
-        target_id = player_array.index('nmalaguti v53') + 1
+    # if 'nmalaguti v54' in player_array:
+    #     target_id = player_array.index('nmalaguti v54') + 1
+    # else:
+    #     target_id = player_array.index('nmalaguti v53') + 1
 
     #  All replays were guaranteed to have one of those bots in them
     #  we also had to make sure to remove the early games b/c they played against bad players
@@ -104,9 +106,9 @@ for index, replay_name in enumerate(os.listdir(REPLAY_FOLDER)):
     player = frames[:, :, :, 0]
 
     #  We don't need this code anymore to determine the "winner" only look at specific bots
-    # players,counts = np.unique(player[-1],return_counts=True)
-    # target_id = players[counts.argmax()]
-    # if target_id == 0: continue
+    players,counts = np.unique(player[-1],return_counts=True)
+    target_id = players[counts.argmax()]
+    if target_id == 0: continue
 
 
     # get all the productions
