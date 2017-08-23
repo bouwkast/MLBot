@@ -15,7 +15,8 @@ from keras.optimizers import SGD, RMSprop
 
 # There are many different optimizer formulas that you can use from Keras
 # Each of them are some form of gradient decent algorithm
-sgd = SGD(lr=0.01, momentum=0.75, decay=1e-8, nesterov=False)
+sgd = SGD(lr=0.0001, momentum=0.75, decay=1e-7, nesterov=True)
+opt = RMSprop(lr=0.0001)
 
 # several optimizers were used/tested and here are some findings:
 
@@ -50,17 +51,22 @@ np.random.seed(0)  # for reproducibility
 # different sizes of the layers were tested - if you go too big (maybe twice this size) the model file
 #       isn't accepted by Halite because of size restrictions
 
-model = Sequential([Dense(512, input_dim=input_dim),
+model = Sequential([Dense(200, input_dim=input_dim),
                     LeakyReLU(),
-                    Dense(512),
+                    Dense(150),
                     LeakyReLU(),
-                    Dense(512),
+                    Dense(100),
+                    LeakyReLU(),
+                    Dense(100),
                     LeakyReLU(),
                     Dense(5, activation='softmax')])
 
+
+
+
 # keras offers different optimizers - while they are similar some are better suited for different tasks
 # rmsprop worked pretty well for this problem
-model.compile('rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
 
 def stack_to_input(stack, position):
@@ -87,12 +93,16 @@ for index, replay_name in enumerate(os.listdir(REPLAY_FOLDER)):
     #  Player IDs start at 1, not 0
     #  Use the below if you want to train on a specific bot - just follow the syntax to fit yours
 
-    # player_array = replay['player_names']  # UNCOMMENT THIS WHEN TRAINING ON SPECIFIC BOT
-    # target_id = player_array.index('erdman v17') + 1
+    player_array = replay['player_names']  # UNCOMMENT THIS WHEN TRAINING ON SPECIFIC BOT
+    if 'erdman v17' in player_array:
+        target_id = player_array.index('erdman v17') + 1
+    elif 'erdman v19' in player_array:
+        target_id = player_array.index('erdman v19') + 1
+
     # target_id = player_array.index('nmalaguti v52') + 1
     # target_id = player_array.index('nmalaguti v53') + 1
     # target_id = player_array.index('nmalaguti v54') + 1
-    # target_id = player_array.index('mzotkiew v23')
+    # target_id = player_array.index('mzotkiew v23') + 1
     # if 'nmalaguti v54' in player_array:
     #     target_id = player_array.index('nmalaguti v54') + 1
     # else:
@@ -106,9 +116,9 @@ for index, replay_name in enumerate(os.listdir(REPLAY_FOLDER)):
     player = frames[:, :, :, 0]
 
     #  We don't need this code anymore to determine the "winner" only look at specific bots
-    players,counts = np.unique(player[-1],return_counts=True)
-    target_id = players[counts.argmax()]
-    if target_id == 0: continue
+    # players,counts = np.unique(player[-1],return_counts=True)
+    # target_id = players[counts.argmax()]
+    # if target_id == 0: continue
 
 
     # get all the productions
@@ -158,10 +168,10 @@ training_target = training_target[indices]
 # if we don't improve in 10 epochs we give up and stop
 # max num of epochs is 1000
 model.fit(training_input, training_target, validation_split=0.2,
-          callbacks=[EarlyStopping(patience=10),
+          callbacks=[EarlyStopping(patience=200),
                      ModelCheckpoint('model.h5', verbose=1, save_best_only=True),
                      tensorboard],
-          batch_size=1024, nb_epoch=1000)
+          batch_size=1024, nb_epoch=10000)
 
 model = load_model('model.h5')
 
