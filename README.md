@@ -1,4 +1,5 @@
 # Machine Learning Halite Bot using TensorFlow
+###Overview
 
 This project will attempt to explain how to setup a machine learning environment that can train a Halite bot based off of some replay files.
 
@@ -10,8 +11,35 @@ it should be a general enough approach that you will be able to apply the method
 
 
 Credit to Github user [brianvanleeuwen](https://github.com/brianvanleeuwen) for supplying the starter code for this machine
-learning bot. - [repo link](https://github.com/brianvanleeuwen/Halite-ML-starter-bot)
+learning bot (almost none of which exists in _this_ repository anymore). - [repo link](https://github.com/brianvanleeuwen/Halite-ML-starter-bot)
 
+###Result
+With my final trained model I was able to irk our a finishing place of **34th**. This put me within the top 2% of all
+contestants overall, rank 2 for undergraduates, and rank 1 within my university - Grand Valley State University.
+
+Leader Board - https://halite.io/leaderboard.php?&page=1 Profile Link - https://halite.io/user.php?userID=4639
+
+This was my first foray into neural networks and I learned a lot through the competition and it created a desire
+to further learning more about modern A.I. The final model that I trained never completely converged, as I
+found out post-competition. My learning rate was approximately 100 times too aggressive, but it did allow
+for the entire training session to only take around 40 hours on a GTX 1080. With the proper settings the model
+that I trained after the competition was still improving (not overfitting) after 5 consecutive days.
+
+The final (competition) model was based off of Erdman's bot entirely. I logged around 5000 of a single version 
+of his bot and rotated and flipped the board to create about 30K games to train on. I found it was more efficient
+to save these games instead of creating them for each training session due to my slow CPU, in all, those 30K
+games took about 300GB of space. (Just goes to show how much data was getting pumped into this model)
+
+During the final week of the competition, all submissions were closed and additional servers were spun 
+up to run the increased load since everyone's bot was playing all at once. Unfortunately, the servers that
+were added were severely underpowered causing my bot to time out about 30% of the time for the first 100 
+games that it played. This caused me to almost get eliminated within the first day due to how poorly my rank
+was - on top of that, the first games that a bot play are the most heavily weighted and I lost 80%
+of my first 20 games due to weak servers. Luckily, they got rid of those servers after figuring out that
+they were underpowered after the first day. Unfortunately, I was never able to climb back up to the rank
+my bot was just before the final competition started - but I'm still happy with its overall performance.
+
+When Halite 2 starts I'll be there.
 
 ### Prerequisites
 
